@@ -1,0 +1,21 @@
+{
+  "name": "dynamic-scheduler",
+  "version": "1.0.0",
+  "description": "A dynamic scheduler",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:yonilerner/dynamic-scheduler.git"
+  },
+  "keywords": [
+    "Dynamic scheduler"
+  ],
+  "author": "Yoni Lerner",
+  "license": "MIT",
+  "devDependencies": {
+    "electron-prebuilt": "^1.2.0"
+  }
+}
