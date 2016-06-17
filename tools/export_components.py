@@ -12,4 +12,7 @@ with open(components_dir + 'index.js', 'w') as index_file:
         with open(components_dir + component, 'r') as component_file:
             file_contents = component_file.read()
             matches = re.search(regex, file_contents)
+            if matches is None:
+                print('Unable to process %s' % component)
+                continue
             index_file.write(export_statement % (matches.group(1), component))
