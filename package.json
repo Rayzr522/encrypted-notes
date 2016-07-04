@@ -1,7 +1,7 @@
 {
-  "name": "dynamic-scheduler",
+  "name": "encrypted-notes",
   "version": "1.0.0",
-  "description": "A dynamic scheduler",
+  "description": "A note encryption app",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:yonilerner/dynamic-scheduler.git"
+    "url": "git@github.com:yonilerner/encrypted-notes.git"
   },
   "keywords": [
     "Dynamic scheduler"
