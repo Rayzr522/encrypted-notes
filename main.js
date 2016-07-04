@@ -5,6 +5,8 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
+const reactDevToolsExtension = "~/.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.14.11_0"
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
