@@ -9,8 +9,7 @@ import DBManager from '../backend/db'
 const NotesList = React.createClass({
     getInitialState() {
         return {
-            items: t(this.props.items, this.getItemsFromDB()),
-            width: t(this.props.width, 400)
+            items: t(this.props.items, this.getItemsFromDB())
         }
     },
 
@@ -38,7 +37,7 @@ const NotesList = React.createClass({
         const noteMoved = DBManager.getNthNote(dragIndex)
         DBManager.updateNote(noteMoved, hoverIndex)
     },
-    
+
     deleteNote(noteId, index) {
         if (confirm('Are you sure you want to delete this note?')) {
             DBManager.deleteNote(noteId)
@@ -52,20 +51,26 @@ const NotesList = React.createClass({
         }
     },
 
+    toggleNoteLock(noteId) {
+        let note = DBManager.getNote(noteId)
+
+        if (note.locked) {
+
+        }
+    },
+
     render() {
         const list = this.state.items.map((note, i) => {
             return (
                 <NoteItem
                     key={note.id} index={i} note={note} deleteNote={this.deleteNote}
                     moveNote={this.moveNote} requestScreenChange={this.props.requestScreenChange}
+                    toggleNoteLock={this.toggleNoteLock}
                 />
             )
         })
-        const style = {width: this.state.width}
         return (
-            <ul style={style}>
-                {list}
-            </ul>
+            <ul>{list}</ul>
         )
     }
 })

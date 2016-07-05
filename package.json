@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.3",
+    "iron": "^4.0.1",
     "jquery": "^2.2.3",
     "node-uuid": "^1.4.7",
     "react": "^15.2.0",

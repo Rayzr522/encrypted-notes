@@ -5,7 +5,20 @@ const screens = {
 
 const unicodeSymbols = {
     delete: '✗',
-    edit: '✎'
+    edit: '✎',
+    locked: '🔒',
+    unlocked: '🔓',
+    check: '✓'
 }
 
-export { screens, unicodeSymbols }
+const keyCodes = {
+    ESCAPE: 27,
+    ENTER: 13
+}
+
+const eventTypes = {
+    CLICK: 'click',
+    KEYDOWN: 'keydown'
+}
+
+export { screens, unicodeSymbols, keyCodes, eventTypes }
