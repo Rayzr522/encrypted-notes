@@ -2,6 +2,8 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import { DragSource, DropTarget } from 'react-dnd'
 import { screens, unicodeSymbols, keyCodes, eventTypes } from '../utils/constants'
+import {config} from '../config'
+import {sleep} from '../utils/helpers'
 
 const dropType = 'note'
 
@@ -68,7 +70,7 @@ const dragSourceCollect = (connect, monitor) => ({
 
 const NoteItem = React.createClass({
     getInitialState() {
-        return {enteringPassword: false, ...this.props}
+        return {enteringPassword: false, currentPassword: '', ...this.props}
     },
 
     editHandler() {
@@ -81,16 +83,28 @@ const NoteItem = React.createClass({
 
     lockHandler() {
         this.setState({enteringPassword: true})
-        setTimeout(() => this.passwordInput.focus(), 0)
+        sleep(0).then(() => this.passwordInput.focus())
+    },
+
+    removePasswordInput() {
+        this.setState({enteringPassword: false})
     },
 
     confirmPassword(e) {
-        if (e.type == eventTypes.CLICK) {
-            return
-        } else if (e.keyCode == keyCodes.ESCAPE) {
-            this.setState({enteringPassword: false})
-            return
-        } else if (e.keyCode != keyCodes.ENTER) {
+        if (e.type == eventTypes.KEYDOWN) {
+            if (e.keyCode == keyCodes.ESCAPE) {
+                this.removePasswordInput()
+                return
+            } else if (e.keyCode != keyCodes.ENTER) {
+                sleep(0).then(() => {
+                    this.setState({currentPassword: this.passwordInput.value})
+                })
+                return
+            }
+        }
+
+        if (!this.validatePassword(this.passwordInput.value)) {
+            alert('Your password is invalid!')
             return
         }
 
@@ -98,7 +112,12 @@ const NoteItem = React.createClass({
             return
         }
 
-        this.props.toggleNoteLock(this.state.note.id, this.passwordInput.value)
+        sleep(0)
+            .then(() => this.props.toggleNoteLock(this.state.note.id, this.passwordInput.value, this.removePasswordInput))
+    },
+
+    validatePassword(password) {
+        return password.length >= config.minimumPasswordLength
     },
 
     componentWillReceiveProps(newProps) {
@@ -126,9 +145,11 @@ const NoteItem = React.createClass({
         let toggleLockSection
 
         if (this.state.enteringPassword) {
+            const borderColor = this.validatePassword(this.state.currentPassword) ? 'green' : 'red'
             toggleLockSection = (
                 <div style={{...buttonStyle, right: 15, top:-6}}>
                     <input
+                        style={{border: `2px solid ${borderColor}`}}
                         type="password" ref={(ref)=>this.passwordInput=ref}
                         onKeyDown={this.confirmPassword} placeholder="Password"
                     />

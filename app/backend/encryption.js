@@ -1,4 +1,5 @@
 import Iron from 'iron'
+import {config} from '../config'
 
 export default class Encryption {
     static get ironMethods() {
@@ -13,13 +14,13 @@ export default class Encryption {
                 saltBits: 256,
                 algorithm: 'aes-256-cbc',
                 iterations: 1,
-                minPasswordlength: 8
+                minPasswordlength: config.minimumPasswordLength
             },
             integrity: {
                 saltBits: 256,
                 algorithm: 'sha256',
                 iterations: 1,
-                minPasswordlength: 8
+                minPasswordlength: config.minimumPasswordLength
             },
             ttl: 0,
             timestampSkewSec: 60,

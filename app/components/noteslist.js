@@ -5,6 +5,7 @@ import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 import {t} from '../utils/helpers'
 import DBManager from '../backend/db'
+import Encryption from '../backend/encryption'
 
 const NotesList = React.createClass({
     getInitialState() {
@@ -51,12 +52,25 @@ const NotesList = React.createClass({
         }
     },
 
-    toggleNoteLock(noteId) {
+    toggleNoteLock(noteId, password, callback) {
         let note = DBManager.getNote(noteId)
 
-        if (note.locked) {
-
+        const doUpdate = (note) => {
+            DBManager.updateNote(note)
         }
+
+        if (note.locked) {
+            Encryption.unseal(note.text, password).then((result) => {
+                note.text = result
+                doUpdate(note)
+            })
+        } else {
+            Encryption.seal(note.text, password).then((result) => {
+                note.text = result
+                doUpdate(note)
+            })
+        }
+        callback()
     },
 
     render() {

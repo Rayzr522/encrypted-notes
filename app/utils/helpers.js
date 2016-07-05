@@ -7,4 +7,6 @@ let type = (obj) =>
 let truthyStr = (str) =>
     type(str) == 'String' &&  str.trim().length > 1
 
-export {t, type, truthyStr}
+let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
+
+export {t, type, truthyStr, sleep}
