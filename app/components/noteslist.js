@@ -1,12 +1,21 @@
 import React from 'react'
 import update from 'react/lib/update'
-import {NoteItem} from './index.js'
+import NoteItem from './noteitem'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
+import {t} from '../utils/helpers'
+import DBManager from '../backend/db'
 
 const NotesList = React.createClass({
     getInitialState() {
-        return {items: this.props.items}
+        return {
+            items: t(this.props.items, this.getItemsFromDB()),
+            width: t(this.props.width, 400)
+        }
+    },
+
+    getItemsFromDB() {
+        return DBManager.getNotesOrdered()
     },
 
     componentWillReceiveProps(newProps) {
@@ -25,17 +34,21 @@ const NotesList = React.createClass({
                 ]
             }
         }))
+
+        const noteMoved = DBManager.getNthNote(dragIndex)
+        DBManager.updateNote(noteMoved, hoverIndex)
     },
 
     render() {
-        let list = this.state.items.map((note, i) => {
-            let title = note.title ? note.title : note.id
+        const list = this.state.items.map((note, i) => {
+            const title = note.title ? note.title : note.id
             return (
                 <NoteItem key={note.id} index={i} id={note.id} text={title} moveNote={this.moveNote}/>
             )
         })
+        const style = {width: this.state.width}
         return (
-            <ul>
+            <ul style={style}>
                 {list}
             </ul>
         )

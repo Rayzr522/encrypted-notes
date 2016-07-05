@@ -1,7 +1,7 @@
 import React from 'react'
 import TinyMCE from 'react-tinymce'
 
-let TinyMCEEditor = React.createClass({
+const TinyMCEEditor = React.createClass({
     handleEditorChange(e) {
         this.setState({content: e.target.getContent()})
     },
@@ -15,7 +15,7 @@ let TinyMCEEditor = React.createClass({
     },
 
     render() {
-        let config = {
+        const config = {
             plugins: [
                 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
                 'searchreplace wordcount visualblocks visualchars code fullscreen',
