@@ -10,6 +10,10 @@ const TinyMCEEditor = React.createClass({
         return {content: this.props.content}
     },
 
+    getContent() {
+        return this.state.content
+    },
+
     setContent(content) {
         this.setState({content: content})
     },
@@ -30,7 +34,7 @@ const TinyMCEEditor = React.createClass({
                 onChange={this.handleEditorChange}
                 content={this.state.content}
                 config={config}
-                ref="editor"
+                ref={(ref) => this.tinymce = ref}
             />
         )
     }

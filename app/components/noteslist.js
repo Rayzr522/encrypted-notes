@@ -38,12 +38,27 @@ const NotesList = React.createClass({
         const noteMoved = DBManager.getNthNote(dragIndex)
         DBManager.updateNote(noteMoved, hoverIndex)
     },
+    
+    deleteNote(noteId, index) {
+        if (confirm('Are you sure you want to delete this note?')) {
+            DBManager.deleteNote(noteId)
+            this.setState(update(this.state, {
+                items: {
+                    $splice: [
+                        [index, 1],
+                    ]
+                }
+            }))
+        }
+    },
 
     render() {
         const list = this.state.items.map((note, i) => {
-            const title = note.title ? note.title : note.id
             return (
-                <NoteItem key={note.id} index={i} id={note.id} text={title} moveNote={this.moveNote}/>
+                <NoteItem
+                    key={note.id} index={i} note={note} deleteNote={this.deleteNote}
+                    moveNote={this.moveNote} requestScreenChange={this.props.requestScreenChange}
+                />
             )
         })
         const style = {width: this.state.width}

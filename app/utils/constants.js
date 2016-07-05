@@ -3,4 +3,9 @@ const screens = {
     EDITOR: 1
 }
 
-export {screens}
+const unicodeSymbols = {
+    delete: '✗',
+    edit: '✎'
+}
+
+export { screens, unicodeSymbols }

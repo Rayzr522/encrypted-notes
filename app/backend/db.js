@@ -20,9 +20,13 @@ export default class DBManager {
         }
     }
 
-    static setNote(note) {
+    static setNote(noteId, note) {
         let notes = db.getAll().notes
-        notes[note.id] = note
+        if (note === null) {
+            delete notes[noteId]
+        } else {
+            notes[noteId] = note
+        }
         db.set(this.collectionName, notes)
     }
 
@@ -58,7 +62,7 @@ export default class DBManager {
         if (db.has(note.id)) {
             throw new Error(`Id ${note.id} already exists in the database!`)
         }
-        this.setNote(note)
+        this.setNote(note.id, note)
 
         let notesOrdering = db.get(this.orderingName)
         notesOrdering.splice(position, 0, note.id)
@@ -71,7 +75,7 @@ export default class DBManager {
         // This shouldnt do anything if there are no changes to the note
         let note = this.getNote(newNote.id)
         Object.assign(note, newNote)
-        this.setNote(note)
+        this.setNote(note.id, note)
 
         // We dont want to modify the positioning if none was specified
         // If the new position is the same as the current one, this cant hurt
@@ -93,6 +97,14 @@ export default class DBManager {
         } else {
             return this.insertNote(note, position)
         }
+    }
+
+    static deleteNote(noteId) {
+        this.setNote(noteId, null)
+        let notesOrdering = db.get(this.orderingName)
+        const noteIndex = notesOrdering.indexOf(noteId)
+        notesOrdering.splice(noteIndex, 1)
+        db.set(this.orderingName, notesOrdering)
     }
 
     static setNotes(notes, ordering) {
