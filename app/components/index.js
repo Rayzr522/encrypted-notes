@@ -1,3 +1,4 @@
+export { default as NoteItem } from './noteitem.js'
 export { default as TinyMCEEditor } from './tinymceeditor.js'
 export { default as DatePicker } from './datepicker.js'
 export { default as NotesList } from './noteslist.js'

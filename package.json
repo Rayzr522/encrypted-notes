@@ -13,11 +13,13 @@
     "url": "git@github.com:yonilerner/encrypted-notes.git"
   },
   "keywords": [
-    "Dynamic scheduler"
+    "encrypted notes"
   ],
   "author": "Yoni Lerner",
   "license": "MIT",
   "devDependencies": {
+    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.5.0",
     "babelify": "^7.3.0",
@@ -30,6 +32,8 @@
     "jquery": "^2.2.3",
     "react": "^15.2.0",
     "react-addons-test-utils": "^15.2.0",
+    "react-dnd": "^2.1.4",
+    "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.2.0",
     "react-tinymce": "^0.5.1",
     "tinymce": "^4.4.0"
