@@ -3,13 +3,9 @@ import ReactDOM from 'react-dom'
 
 import ReactTestUtils from 'react-addons-test-utils'
 
-import {DatePicker, MainPage, TinyMCEEditor} from './components/index.js'
+import {StartScreen} from './components/index.js'
 
-
-const editor = <TinyMCEEditor content="hey"/>
-
-ReactDOM.render(editor, document.getElementById('content'))
+ReactDOM.render(<StartScreen/>, document.getElementById('app'))
 
 window.test = ReactTestUtils
 window.ReactDOM = ReactDOM
-window.editor = editor
