@@ -121,7 +121,7 @@ const NoteItem = React.createClass({
     },
 
     componentWillReceiveProps(newProps) {
-        this.setState({index: newProps.index})
+        this.setState({index: newProps.index, note: newProps.note})
     },
 
     render() {
@@ -134,7 +134,7 @@ const NoteItem = React.createClass({
             <span
                 title={`${this.state.note.locked ? 'Locked' : 'Unlocked'}`}
                 style={{
-                    cursor: 'pointer', color: this.state.note.locked ? 'green' : 'red',
+                    color: this.state.note.locked ? 'green' : 'red',
                     paddingRight: 10, top: -2, position: 'relative'
                 }}
             >

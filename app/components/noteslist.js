@@ -6,6 +6,7 @@ import HTML5Backend from 'react-dnd-html5-backend'
 import {t} from '../utils/helpers'
 import DBManager from '../backend/db'
 import Encryption from '../backend/encryption'
+import {sleep} from '../utils/helpers'
 
 const NotesList = React.createClass({
     getInitialState() {
@@ -57,16 +58,24 @@ const NotesList = React.createClass({
 
         const doUpdate = (note) => {
             DBManager.updateNote(note)
+            sleep(0).then(() => {
+                console.log(this.getItemsFromDB())
+                this.setState({
+                    items: this.getItemsFromDB()
+                })
+            })
         }
 
         if (note.locked) {
             Encryption.unseal(note.text, password).then((result) => {
                 note.text = result
+                note.locked = false
                 doUpdate(note)
             })
         } else {
             Encryption.seal(note.text, password).then((result) => {
                 note.text = result
+                note.locked = true
                 doUpdate(note)
             })
         }
