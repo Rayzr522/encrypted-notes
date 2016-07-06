@@ -78,6 +78,7 @@ const NoteItem = React.createClass({
     },
 
     deleteHandler() {
+        // TODO Dont allow deleting of notes that are locked
         this.props.deleteNote(this.state.note.id, this.state.index)
     },
 
