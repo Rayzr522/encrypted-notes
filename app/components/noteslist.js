@@ -58,12 +58,7 @@ const NotesList = React.createClass({
 
         const doUpdate = (note) => {
             DBManager.updateNote(note)
-            sleep(0).then(() => {
-                console.log(this.getItemsFromDB())
-                this.setState({
-                    items: this.getItemsFromDB()
-                })
-            })
+            sleep(0).then(() => this.setState({items: this.getItemsFromDB()}))
         }
 
         if (note.locked) {
