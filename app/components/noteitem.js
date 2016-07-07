@@ -1,11 +1,9 @@
 import React from 'react'
-import { findDOMNode } from 'react-dom'
-import { DragSource, DropTarget } from 'react-dnd'
 import { screens, unicodeSymbols, keyCodes, eventTypes } from '../utils/constants'
-import {config} from '../config'
-import {sleep} from '../utils/helpers'
-
-const dropType = 'note'
+import { config } from '../config'
+import { sleep } from '../utils/helpers'
+import { cardSource, cardTarget, dragSourceCollect, dropTargetCollect, dropType } from '../utils/dragAndDropHelpers'
+import { DragSource, DropTarget } from 'react-dnd'
 
 const listItemStyle = {
     border: '1px dashed gray',
@@ -23,54 +21,13 @@ const buttonStyle = {
     cursor: 'pointer'
 }
 
-const cardSource = {
-    beginDrag(props) {
-        return {
-            id: props.note.id,
-            index: props.index
-        }
-    }
-}
-
-const cardTarget = {
-    hover(props, monitor, component) {
-        const draggedFromIndex = monitor.getItem().index
-        const hoverToIndex = props.index
-
-        if (draggedFromIndex == hoverToIndex) {
-            return
-        }
-
-        const hoverBoundingRect = findDOMNode(component).getBoundingClientRect()
-        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
-
-        const clientOffset = monitor.getClientOffset()
-
-        const hoverClientY = clientOffset.y - hoverBoundingRect.top
-
-        if (draggedFromIndex < hoverToIndex && hoverClientY < hoverMiddleY) {
-            return
-        }
-        if (draggedFromIndex > hoverToIndex && hoverClientY > hoverMiddleY) {
-            return
-        }
-
-        props.moveNote(draggedFromIndex, hoverToIndex)
-        monitor.getItem().index = hoverToIndex
-    }
-}
-
-const dropTargetCollect = (connect) => ({
-    connectDropTarget: connect.dropTarget()
-})
-const dragSourceCollect = (connect, monitor) => ({
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
-})
-
 const NoteItem = React.createClass({
     getInitialState() {
-        return {enteringPassword: false, currentPassword: '', ...this.props}
+        return {
+            enteringPassword: false,
+            currentPassword: '',
+            ...this.props
+        }
     },
 
     editHandler() {
@@ -114,7 +71,9 @@ const NoteItem = React.createClass({
         }
 
         sleep(0)
-            .then(() => this.props.toggleNoteLock(this.state.note.id, this.passwordInput.value, this.removePasswordInput))
+            .then(() =>
+                this.props.toggleNoteLock(this.state.note.id, this.passwordInput.value, this.removePasswordInput)
+            )
     },
 
     validatePassword(password) {
@@ -126,7 +85,7 @@ const NoteItem = React.createClass({
     },
 
     render() {
-        const {note, isDragging, connectDragSource, connectDropTarget} = this.props
+        const { note, isDragging, connectDragSource, connectDropTarget } = this.props
 
         const opacity = isDragging ? 0 : 1
         const title = note.title ? note.title : note.id
@@ -187,4 +146,9 @@ const NoteItem = React.createClass({
     }
 })
 
-export default DropTarget(dropType, cardTarget, dropTargetCollect)(DragSource(dropType, cardSource, dragSourceCollect)(NoteItem))
+export default
+    DropTarget(dropType, cardTarget, dropTargetCollect)(
+        DragSource(dropType, cardSource, dragSourceCollect)(
+            NoteItem
+        )
+    )
