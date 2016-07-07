@@ -67,7 +67,7 @@ export default class DBManager {
         let notesOrdering = db.get(this.orderingName)
         notesOrdering.splice(position, 0, note.id)
         db.set(this.orderingName, notesOrdering)
-        
+
         return note
     }
 
@@ -100,6 +100,10 @@ export default class DBManager {
     }
 
     static deleteNote(noteId) {
+        const note = this.getNote(noteId)
+        if (note.locked) {
+            throw new Error('You cannot delete a locked note!')
+        }
         this.setNote(noteId, null)
         let notesOrdering = db.get(this.orderingName)
         const noteIndex = notesOrdering.indexOf(noteId)
