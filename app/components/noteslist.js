@@ -23,21 +23,21 @@ const NotesList = React.createClass({
         this.setState({items: newProps.items})
     },
 
-    moveNote(dragIndex, hoverIndex) {
+    moveNote(draggedFromIndex, hoverToIndex) {
         const {items} = this.state
-        const dragCard = items[dragIndex]
+        const draggedCard = items[draggedFromIndex]
 
         this.setState(update(this.state, {
             items: {
                 $splice: [
-                    [dragIndex, 1],
-                    [hoverIndex, 0, dragCard]
+                    [draggedFromIndex, 1],
+                    [hoverToIndex, 0, draggedCard]
                 ]
             }
         }))
 
-        const noteMoved = DBManager.getNthNote(dragIndex)
-        DBManager.updateNote(noteMoved, hoverIndex)
+        const noteMoved = DBManager.getNthNote(draggedFromIndex)
+        DBManager.updateNote(noteMoved, hoverToIndex)
     },
 
     deleteNote(noteId, index) {

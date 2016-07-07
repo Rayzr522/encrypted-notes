@@ -34,10 +34,10 @@ const cardSource = {
 
 const cardTarget = {
     hover(props, monitor, component) {
-        const dragIndex = monitor.getItem().index
-        const hoverIndex = props.index
+        const draggedFromIndex = monitor.getItem().index
+        const hoverToIndex = props.index
 
-        if (dragIndex == hoverIndex) {
+        if (draggedFromIndex == hoverToIndex) {
             return
         }
 
@@ -48,15 +48,15 @@ const cardTarget = {
 
         const hoverClientY = clientOffset.y - hoverBoundingRect.top
 
-        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        if (draggedFromIndex < hoverToIndex && hoverClientY < hoverMiddleY) {
             return
         }
-        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        if (draggedFromIndex > hoverToIndex && hoverClientY > hoverMiddleY) {
             return
         }
 
-        props.moveNote(dragIndex, hoverIndex)
-        monitor.getItem().index = hoverIndex
+        props.moveNote(draggedFromIndex, hoverToIndex)
+        monitor.getItem().index = hoverToIndex
     }
 }
 
