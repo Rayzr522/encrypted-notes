@@ -2,14 +2,25 @@
 // Using a dict to store the data and a separate array to store the proper order of the keys
 
 import db from '../utils/localStorage'
+import { t } from '../utils/helpers'
 import uuid from 'node-uuid'
+window.db = db
 
-export default class DBManager {
-    static get collectionName() {return 'notes'}
-    static get orderingName() {return 'notesOrdering'}
+class DBManager {
+    static get collectionName() { return 'notes' }
+    static get orderingName() { return 'notesOrdering' }
+    static get tokenName() { return 'notesToken' }
 
     static getUUID() {
         return uuid.v4()
+    }
+
+    static getCurrentToken() {
+        return t(db.get(this.tokenName), null)
+    }
+
+    static setCurrentToken(token) {
+        db.set(this.tokenName, token)
     }
 
     static getNote(comparator = (() => true)) {
@@ -28,6 +39,14 @@ export default class DBManager {
             notes[noteId] = note
         }
         db.set(this.collectionName, notes)
+    }
+
+    static getAllNotes() {
+        return db.get(this.collectionName)
+    }
+
+    static getNotesOrdering() {
+        return db.get(this.orderingName)
     }
 
     static getNotesOrdered(comparator = (() => true)) {
@@ -138,3 +157,6 @@ export default class DBManager {
         }
     }
 }
+
+window.DBManager = DBManager
+export default DBManager

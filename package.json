@@ -26,6 +26,7 @@
     "electron-react-devtools": "^0.3.1"
   },
   "dependencies": {
+    "deep-diff": "^0.3.4",
     "electron-prebuilt": "^1.2.0",
     "electron-reload": "^1.0.0",
     "iron": "^4.0.1",

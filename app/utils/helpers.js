@@ -9,4 +9,7 @@ let truthyStr = (str) =>
 
 let sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
 
-export {t, type, truthyStr, sleep}
+let validateUUID = (str) =>
+    str.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/) != null
+
+export {t, type, truthyStr, sleep, validateUUID }

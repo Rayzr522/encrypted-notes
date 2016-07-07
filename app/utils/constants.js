@@ -1,6 +1,7 @@
 const screens = {
     START: 0,
-    EDITOR: 1
+    EDITOR: 1,
+    SYNC: 2
 }
 
 const unicodeSymbols = {
