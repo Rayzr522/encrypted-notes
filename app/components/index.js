@@ -1,7 +1,0 @@
-export { default as DropTarget } from './noteitem.js'
-export { default as TinyMCEEditor } from './tinymceeditor.js'
-export { default as DatePicker } from './datepicker.js'
-export { default as DragDropContext } from './noteslist.js'
-export { default as StartScreen } from './startscreen.js'
-export { default as BasicRouter } from './basicrouter.js'
-export { default as MainPage } from './mainpage.js'

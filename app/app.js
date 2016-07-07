@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {BasicRouter} from './components/index.js'
+import BasicRouter from './components/basicrouter'
 import DBManager from './backend/db'
 
 DBManager.checkDatabaseInitialization()
