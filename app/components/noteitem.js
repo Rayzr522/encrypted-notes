@@ -10,7 +10,9 @@ const listItemStyle = {
     padding: '0.5rem 1rem',
     marginBottom: '.5rem',
     backgroundColor: 'white',
-    cursor: 'move'
+    cursor: 'move',
+    paddingLeft: 25,
+    marginRight: 45
 }
 
 const buttonStyle = {

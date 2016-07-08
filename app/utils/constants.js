@@ -9,7 +9,8 @@ const unicodeSymbols = {
     edit: '✎',
     locked: '🔒',
     unlocked: '🔓',
-    check: '✓'
+    check: '✓',
+    burger: '☰'
 }
 
 const keyCodes = {
@@ -22,4 +23,11 @@ const eventTypes = {
     KEYDOWN: 'keydown'
 }
 
-export { screens, unicodeSymbols, keyCodes, eventTypes }
+const diffKinds = {
+    EDIT: 'E',
+    NEW: 'N',
+    DEL: 'D',
+    ARR: 'A'
+}
+
+export { screens, unicodeSymbols, keyCodes, eventTypes, diffKinds }

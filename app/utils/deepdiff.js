@@ -53,7 +53,7 @@
         });
     }
 
-    function Diff(kind, path) {
+    function Diff(kind, path, timestamp) {
         Object.defineProperty(this, 'kind', {
             value: kind,
             enumerable: true
@@ -64,10 +64,14 @@
                 enumerable: true
             });
         }
+        Object.defineProperty(this, 'timestamp', {
+            value: timestamp,
+            enumerable: true
+        })
     }
 
-    function DiffEdit(path, origin, value) {
-        DiffEdit.super_.call(this, 'E', path);
+    function DiffEdit(path, origin, value, timestamp) {
+        DiffEdit.super_.call(this, 'E', path, timestamp);
         Object.defineProperty(this, 'lhs', {
             value: origin,
             enumerable: true
@@ -79,8 +83,8 @@
     }
     inherits(DiffEdit, Diff);
 
-    function DiffNew(path, value) {
-        DiffNew.super_.call(this, 'N', path);
+    function DiffNew(path, value, timestamp) {
+        DiffNew.super_.call(this, 'N', path, timestamp);
         Object.defineProperty(this, 'rhs', {
             value: value,
             enumerable: true
@@ -88,8 +92,8 @@
     }
     inherits(DiffNew, Diff);
 
-    function DiffDeleted(path, value) {
-        DiffDeleted.super_.call(this, 'D', path);
+    function DiffDeleted(path, value, timestamp) {
+        DiffDeleted.super_.call(this, 'D', path, timestamp);
         Object.defineProperty(this, 'lhs', {
             value: value,
             enumerable: true
@@ -97,8 +101,8 @@
     }
     inherits(DiffDeleted, Diff);
 
-    function DiffArray(path, index, item) {
-        DiffArray.super_.call(this, 'A', path);
+    function DiffArray(path, index, item, timestamp) {
+        DiffArray.super_.call(this, 'A', path, timestamp);
         Object.defineProperty(this, 'index', {
             value: index,
             enumerable: true

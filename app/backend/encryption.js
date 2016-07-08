@@ -1,5 +1,5 @@
 import Iron from 'iron'
-import {config} from '../config'
+import { config } from '../config'
 
 export default class Encryption {
     static get ironMethods() {

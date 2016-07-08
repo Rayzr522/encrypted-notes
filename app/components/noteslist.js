@@ -41,7 +41,7 @@ const NotesList = React.createClass({
     },
 
     deleteNote(noteId, index) {
-        if (confirm('Are you sure you want to delete this note?')) {
+        if (confirm('Are you sure you want to delete this note? Once deleted, a note cannot be recovered!')) {
             DBManager.deleteNote(noteId)
             this.setState(update(this.state, {
                 items: {
@@ -96,7 +96,9 @@ const NotesList = React.createClass({
             )
         })
         return (
-            <ul>{list}</ul>
+            <ul style={{listStyleType: 'none'}}>
+                {list}
+            </ul>
         )
     }
 })

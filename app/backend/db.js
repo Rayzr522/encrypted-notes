@@ -4,11 +4,13 @@
 import db from '../utils/localStorage'
 import { t } from '../utils/helpers'
 import uuid from 'node-uuid'
+import Encryption from './encryption'
 window.db = db
 
 class DBManager {
     static get collectionName() { return 'notes' }
     static get orderingName() { return 'notesOrdering' }
+    static get orderingTimestamp() { return 'notesOrderingTimestamp' }
     static get tokenName() { return 'notesToken' }
 
     static getUUID() {
@@ -23,6 +25,23 @@ class DBManager {
         db.set(this.tokenName, token)
     }
 
+    static getNotesOrdering() {
+        return db.get(this.orderingName)
+    }
+
+    static getNotesOrderingTimestamp() {
+        return db.get(this.orderingTimestamp)
+    }
+
+    static setNotesOrdering(ordering) {
+        db.set(this.orderingName, ordering)
+        this.setNotesOrderingTimestamp()
+    }
+
+    static setNotesOrderingTimestamp(timestamp = Date.now()) {
+        db.set(this.orderingTimestamp, timestamp)
+    }
+
     static getNote(comparator = (() => true)) {
         if (typeof comparator == 'function') {
             return this.getNotesOrdered(comparator).reverse().pop()
@@ -33,6 +52,7 @@ class DBManager {
 
     static setNote(noteId, note) {
         let notes = db.getAll().notes
+        note.timestamp = Date.now()
         if (note === null) {
             delete notes[noteId]
         } else {
@@ -45,13 +65,9 @@ class DBManager {
         return db.get(this.collectionName)
     }
 
-    static getNotesOrdering() {
-        return db.get(this.orderingName)
-    }
-
-    static getNotesOrdered(comparator = (() => true)) {
-        const notesDict = db.get(this.collectionName)
-        const notesOrdering = db.get(this.orderingName)
+    static getNotesOrdered(comparator = ((note) => !note.deleted)) {
+        const notesDict = this.getAllNotes()
+        const notesOrdering = this.getNotesOrdering()
 
         let notes = []
 
@@ -66,6 +82,7 @@ class DBManager {
         return notes
     }
 
+    // Primarily as a debugging tool
     static getNthNote(n) {
         const orderedNotes = this.getNotesOrdered()
         if (orderedNotes.length <= n) {
@@ -81,11 +98,14 @@ class DBManager {
         if (db.has(note.id)) {
             throw new Error(`Id ${note.id} already exists in the database!`)
         }
+        if (note.locked == null) {
+            note.locked = false
+        }
         this.setNote(note.id, note)
 
-        let notesOrdering = db.get(this.orderingName)
+        let notesOrdering = this.getNotesOrdering()
         notesOrdering.splice(position, 0, note.id)
-        db.set(this.orderingName, notesOrdering)
+        this.setNotesOrdering(notesOrdering)
 
         return note
     }
@@ -101,11 +121,11 @@ class DBManager {
         if (newPosition == null) {
             return
         }
-        let notesOrdering = db.get(this.orderingName)
+        let notesOrdering = this.getNotesOrdering()
         const noteIndex = notesOrdering.indexOf(note.id)
         notesOrdering.splice(noteIndex, 1)
         notesOrdering.splice(newPosition, 0, note.id)
-        db.set(this.orderingName, notesOrdering)
+        this.setNotesOrdering(notesOrdering)
 
         return note
     }
@@ -123,37 +143,53 @@ class DBManager {
         if (note.locked) {
             throw new Error('You cannot delete a locked note!')
         }
-        this.setNote(noteId, null)
-        let notesOrdering = db.get(this.orderingName)
+
+        note.deleted = true
+        Encryption.seal(note.text, this.getUUID()).then((result) => {
+            note.text = result
+            this.setNote(noteId, note)
+        })
+        this.setNote(noteId, note)
+
+        let notesOrdering = this.getNotesOrdering()
         const noteIndex = notesOrdering.indexOf(noteId)
         notesOrdering.splice(noteIndex, 1)
-        db.set(this.orderingName, notesOrdering)
+        this.setNotesOrdering(notesOrdering)
     }
 
     static setNotes(notes, ordering) {
-        db.set(this.collectionName, notes)
-        db.set(this.orderingName, ordering)
+        if (notes) {
+            db.set(this.collectionName, notes)
+        }
+        if (ordering) {
+            this.setNotesOrdering(ordering)
+        }
     }
 
     static checkDatabaseInitialization() {
-        const notesOrdering = db.get(this.orderingName)
+        const notesOrdering = this.getNotesOrdering()
         if (notesOrdering == undefined) {
             this.setNotes({}, [])
             return
         }
 
-        const notes = db.getAll().notes
+        const notes = this.getAllNotes()
         if (!notes) {
             this.setNotes({}, [])
             return
         }
 
-        if (Object.keys(notes).length != notesOrdering.length) {
+        const notesLength = objToArr(notes).map(
+            (note) => !note.deleted
+        ).filter(
+            (deleted) => deleted
+        ).length
+
+        if (notesLength != notesOrdering.length) {
             console.error(
                 `There is an inconsistency between notes and their ordering.
-                There are ${Object.keys(notes).length} notes and ${notesOrdering.length} ordering items.`
+                There are ${notesLength} notes and ${notesOrdering.length} ordering items.`
             )
-            return
         }
     }
 }
