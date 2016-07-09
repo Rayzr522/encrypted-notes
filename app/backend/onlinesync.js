@@ -1,6 +1,5 @@
 import DBManager from './db'
 import deepDiff from 'deep-diff'
-import { toEmptyDicts } from '../utils/helpers'
 import { diffKinds } from '../utils/constants'
 import SyncTest from '../tests/onlinesync'
 
@@ -139,6 +138,9 @@ class Sync {
 
     }
 }
+
+// For CLI testing
+window.st = SyncTest
 window.dd = deepDiff
 window.Sync = Sync
 export default Sync

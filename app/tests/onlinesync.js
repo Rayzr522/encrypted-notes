@@ -24,6 +24,7 @@ class SyncTest {
         this.test1()
         this.test2()
         this.test3()
+        this.test4()
     }
 
     static checkTest(testNum, eN, eO, aN, aO) {
@@ -101,7 +102,32 @@ class SyncTest {
         const [notes, order] = Sync.sync(localData, remoteData)
         this.checkTest(3, expectedNotes, expectedOrdering, notes, order)
     }
+
+    static test4() {
+        let localData = {
+            notes: {
+                a: {timestamp: 2},
+                b: {timestamp: 2, text: 'encrypted'}
+            }, notesOrdering: ['a', 'b'],
+            notesOrderingTimestamp: 1
+        }
+        let remoteData = {
+            notes: {
+                a: {timestamp: 1, deleted: true},
+                b: {timestamp: 1, text: 'hey'},
+                c: {}, d: {deleted: true}, f: {}
+            }, notesOrdering: ['b', 'c', 'f'],
+            notesOrderingTimestamp: 2
+        }
+        let expectedNotes = {
+            a: {timestamp: 2},
+            b: {timestamp: 2, text: 'encrypted'},
+            c: {}, d: {deleted: true}, f: {}
+        }
+        let expectedOrdering = ['b', 'c', 'f', 'a']
+        const [notes, order] = Sync.sync(localData, remoteData)
+        this.checkTest(4, expectedNotes, expectedOrdering, notes, order)
+    }
 }
 window.toEmptyDicts = toEmptyDicts
-window.st = SyncTest
 export default SyncTest
