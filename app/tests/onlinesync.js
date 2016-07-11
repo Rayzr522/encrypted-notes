@@ -29,14 +29,14 @@ class SyncTest {
 
     static checkTest(testNum, eN, eO, aN, aO) {
         if (deepDiff(eN, aN) === undefined) {
-            this.log(testNum, 'Notes worked', eN, aN)
+            this.log(testNum, 'Notes worked (e, a)', eN, aN)
         } else {
-            console.error(testNum, 'notes didnt work', eN, aN)
+            console.error(testNum, 'notes didnt work (e, a)', eN, aN)
         }
         if (deepDiff(eO, aO) === undefined) {
-            this.log(testNum, 'Order worked', eO, aO)
+            this.log(testNum, 'Order worked (e, a)', eO, aO)
         } else {
-            console.error(testNum, 'order didnt work', eO, aO)
+            console.error(testNum, 'order didnt work (e, a)', eO, aO)
         }
         this.debug = false
     }
@@ -115,14 +115,14 @@ class SyncTest {
             notes: {
                 a: {timestamp: 1, deleted: true},
                 b: {timestamp: 1, text: 'hey'},
-                c: {}, d: {deleted: true}, f: {}
+                c: {}, d: {deleted: true}, f: {deleted: false, text: ''}
             }, notesOrdering: ['b', 'c', 'f'],
             notesOrderingTimestamp: 2
         }
         let expectedNotes = {
             a: {timestamp: 2},
             b: {timestamp: 2, text: 'encrypted'},
-            c: {}, d: {deleted: true}, f: {}
+            c: {}, d: {deleted: true}, f: {deleted: false, text: ''}
         }
         let expectedOrdering = ['b', 'c', 'f', 'a']
         const [notes, order] = Sync.sync(localData, remoteData)

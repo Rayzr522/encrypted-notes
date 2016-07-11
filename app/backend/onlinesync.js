@@ -88,26 +88,25 @@ class Sync {
             const localNote = localNotes[noteId]
             const remoteNote = remoteNotes[noteId]
 
-            if (!remoteNote) {
-                /*
-                If there was no remote quivalent, but we are using the remote ordering to start,
-                then we need to push the local note into the order
-                 */
-                if (remoteOrderingTimestamp > localOrderingTimestamp && newOrder.indexOf(noteId) == -1) {
-                    newOrder.push(noteId)
-                }
+            if (
+                localNote && !localNote.deleted && remoteOrderingTimestamp > localOrderingTimestamp &&
+                    newOrder.indexOf(noteId) == -1
+            ) {
+                newOrder.push(noteId)
                 return
-            }
-
-            // If there was no local equivalent, then apply the addition
-            if (!localNote) {
+            } else if (!localNote) {
                 deepDiff.applyChange(localNotes, remoteNotes, d)
 
                 /*
                 If there was no local equivalent, and the remote note is not deleted,
-                then we want to push it into the order
+                then we want to push it into the order.
+                We dont have to check that the item is already in the order because of two factors:
+                1. We are not using the remote ordering (remoteOrderingTimestamp < localOrderingTimestamp)
+                AND
+                2. Any time there isnt a corresponding local note, the diff wont recognize more than a single new item,
+                no matter how many properties it has. So this can never be called once if !localNote. Therefore no dups.
                  */
-                if (remoteNote.deleted !== true && newOrder.indexOf(noteId) == -1) {
+                if (remoteNote.deleted !== true && remoteOrderingTimestamp < localOrderingTimestamp) {
                     newOrder.push(noteId)
                 }
                 return
