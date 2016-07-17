@@ -2,41 +2,43 @@ import DBManager from './db'
 import deepDiff from 'deep-diff'
 import { diffKinds } from '../utils/constants'
 import SyncTest from '../tests/onlinesync'
+import request from 'request'
+import { config } from '../config'
 
 class Sync {
-    static getRemoteData(token) {
-        return {
-            "notes": {
-                "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12": {
-                    "id": "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12",
-                    "title": "First (Orig)",
-                    "text": "<p>some text</p>",
-                    "locked": false,
-                    "timestamp": 1467937494042
-                },
-                "6bbe5ca3-8e0d-497b-a1ba-024396345979": {
-                    "id": "6bbe5ca3-8e0d-497b-a1ba-024396345979",
-                    "title": "Second (Orig)",
-                    "text": "Fe26.2**71621787eee319ac446197910d558ec2ea392d1496b69c415f3a4d4fb0413312*8e_2Ll3MP43qqI4JaEID8g*FjC_rPjlzp1rUjth4eNdXsQZJjrmcwvbkiR2zTdbt5Y**fa175e7e1ce84347a3b5245be29a5a475c0fef6dfb02566fda6fbfd42a0e1cab*WhNfJciKkWmREUYlVOGMZiqsvHDoD0cD_U5dsGS97bI",
-                    "locked": true,
-                    "timestamp": 1467937616191
-                },
-                "18f2b1e6-444c-4981-876e-82b459d25e5e": {
-                    "id": "18f2b1e6-444c-4981-876e-82b459d25e5e",
-                    "locked": false,
-                    "timestamp": 1467937548590,
-                    "title": "to delete yo",
-                    "text": "Fe26.2**8f9a5ec33d9122c996dd2ac15fae70e1a9fd9630d8840e343fc2d8e4a893e7ea*dupIWuAFhfDOatR2ecDsiw*KiZbCYJEuGsKOR_fRwz8dnxbxRo7xXvh0JxZJfz-hhI**584c5b183bd7f2114763610ff3a8dc1485ba098b511141ea04035d11af68381d*VZxvATygv3f3Vr-lvf2GmscoGK9CxG23yI1VPrTiY3A",
-                    "deleted": true
+    static getRemoteData(token, callback) {
+        const url = `http://localhost:3000/notes/${token}`
+        return request(url, (err, incoming, res) => {
+            if (err) {
+                console.error(err)
+                callback(false)
+            } else {
+                if (incoming.statusCode == 404) {
+                    callback({msg: 'Invalid key', statusCode: 404})
+                } else if (incoming.statusCode == 200) {
+                    callback({statusCode: 200, msg: res})
+                } else {
+                    console.error(`Invalid status code for ${url}`)
                 }
-            },
-            "notesOrdering": [
-                "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12",
-                "6bbe5ca3-8e0d-497b-a1ba-024396345979"
-            ],
-            "notesOrderingTimestamp": Date.now(),
-            "token": DBManager.getCurrentToken()
-        }
+            }
+        })
+    }
+
+    static updateRemoteDataWithLocal(token, callback) {
+        const url = config.syncUrl + token
+        return request.post(url, {form: this.getLocalData()}, (err, incoming, res) => {
+            if (err) {
+                console.error(err)
+            } else {
+                if (incoming.statusCode == 500) {
+                    callback({msg: 'Unable to update remote with latest changes.', statusCode: 500})
+                } else if (incoming.statusCode == 200) {
+                    callback({statusCode: 200, msg: res})
+                } else {
+                    console.error(`Invalid status code for ${url}`)
+                }
+            }
+        })
     }
 
     static getLocalData() {
@@ -48,12 +50,10 @@ class Sync {
         }
     }
 
-
-
-    static sync(localData = this.getLocalData(), remoteData = this.getRemoteData(localData.token)) {
+    static merge(localData = this.getLocalData(), remoteData = null) {
         if (remoteData.token != localData.token) {
             console.error(`Local token is ${localData.token} but remote token is ${remoteData.token}!`)
-            return
+            return [localData.notes, localData.notesOrdering]
         }
 
         const {
@@ -81,8 +81,8 @@ class Sync {
 
         /*
          After this finishes, each note in localData will be updated with data from
-            remoteData if the remote note has a later timestamp than the local note
-          */
+         remoteData if the remote note has a later timestamp than the local note
+         */
         deepDiff.observableDiff(localNotes, remoteNotes, (d) => {
             const noteId = d.path[0]
             const localNote = localNotes[noteId]
@@ -90,7 +90,7 @@ class Sync {
 
             if (
                 localNote && !localNote.deleted && remoteOrderingTimestamp > localOrderingTimestamp &&
-                    newOrder.indexOf(noteId) == -1
+                newOrder.indexOf(noteId) == -1
             ) {
                 newOrder.push(noteId)
                 return
@@ -98,13 +98,13 @@ class Sync {
                 deepDiff.applyChange(localNotes, remoteNotes, d)
 
                 /*
-                If there was no local equivalent, and the remote note is not deleted,
-                then we want to push it into the order.
-                We dont have to check that the item is already in the order because of two factors:
-                1. We are not using the remote ordering (remoteOrderingTimestamp < localOrderingTimestamp)
-                AND
-                2. Any time there isnt a corresponding local note, the diff wont recognize more than a single new item,
-                no matter how many properties it has. So this can never be called once if !localNote. Therefore no dups.
+                 If there was no local equivalent, and the remote note is not deleted,
+                 then we want to push it into the order.
+                 We dont have to check that the item is already in the order because of two factors:
+                 1. We are not using the remote ordering (remoteOrderingTimestamp < localOrderingTimestamp)
+                 AND
+                 2. Any time there isnt a corresponding local note, the diff wont recognize more than a single new item,
+                 no matter how many properties it has. So this can never be called once if !localNote. Therefore no dups.
                  */
                 if (remoteNote.deleted !== true && remoteOrderingTimestamp < localOrderingTimestamp) {
                     newOrder.push(noteId)
@@ -130,7 +130,24 @@ class Sync {
         }
 
         return [localNotes, newOrder]
+    }
 
+    /*
+    Returns a Promise
+     */
+    static sync() {
+        const localData = this.getLocalData()
+
+        const mergedDataPromise = new Promise((resolve, reject) => {
+            this.getRemoteData(localData.token, (res) => {
+                resolve(this.merge(localData, res))
+            })
+        })
+        mergedDataPromise.then((merged) => {
+            const [mergedNotes, mergedOrdering] = merged
+            DBManager.setNotes(mergedNotes, mergedOrdering)
+            this.updateRemoteDataWithLocal(localData.token, (res) => {})
+        })
     }
 
     static handleChanges() {

@@ -36,6 +36,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^15.2.0",
     "react-tinymce": "^0.5.1",
+    "request": "^2.73.0",
     "tinymce": "^4.4.0"
   }
 }

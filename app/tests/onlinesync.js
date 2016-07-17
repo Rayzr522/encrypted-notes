@@ -57,7 +57,7 @@ class SyncTest {
         }
         let expectedNotes = toEmptyDicts('abcdf')
         let expectedOrder = 'adcbf'.split('')
-        const [notes, order] = Sync.sync(localData, remoteData)
+        const [notes, order] = Sync.merge(localData, remoteData)
         this.checkTest(1, expectedNotes, expectedOrder, notes, order)
     }
 
@@ -75,7 +75,7 @@ class SyncTest {
         }
         let expectedNotes = toEmptyDicts('aBc')
         let expectedOrder = 'ac'.split('')
-        const [notes, order] = Sync.sync(localData, remoteData)
+        const [notes, order] = Sync.merge(localData, remoteData)
         this.checkTest(2, expectedNotes, expectedOrder, notes, order)
     }
 
@@ -99,7 +99,7 @@ class SyncTest {
             b: {timestamp: 2}
         }
         let expectedOrdering = ['b']
-        const [notes, order] = Sync.sync(localData, remoteData)
+        const [notes, order] = Sync.merge(localData, remoteData)
         this.checkTest(3, expectedNotes, expectedOrdering, notes, order)
     }
 
@@ -125,9 +125,45 @@ class SyncTest {
             c: {}, d: {deleted: true}, f: {deleted: false, text: ''}
         }
         let expectedOrdering = ['b', 'c', 'f', 'a']
-        const [notes, order] = Sync.sync(localData, remoteData)
+        const [notes, order] = Sync.merge(localData, remoteData)
         this.checkTest(4, expectedNotes, expectedOrdering, notes, order)
     }
 }
 window.toEmptyDicts = toEmptyDicts
 export default SyncTest
+
+/*
+Some test data
+ {
+ "notes": {
+ "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12": {
+ "id": "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12",
+ "title": "First (Orig)",
+ "text": "<p>some text</p>",
+ "locked": false,
+ "timestamp": 1467937494042
+ },
+ "6bbe5ca3-8e0d-497b-a1ba-024396345979": {
+ "id": "6bbe5ca3-8e0d-497b-a1ba-024396345979",
+ "title": "Second (Orig)",
+ "text": "Fe26.2**71621787eee319ac446197910d558ec2ea392d1496b69c415f3a4d4fb0413312*8e_2Ll3MP43qqI4JaEID8g*FjC_rPjlzp1rUjth4eNdXsQZJjrmcwvbkiR2zTdbt5Y**fa175e7e1ce84347a3b5245be29a5a475c0fef6dfb02566fda6fbfd42a0e1cab*WhNfJciKkWmREUYlVOGMZiqsvHDoD0cD_U5dsGS97bI",
+ "locked": true,
+ "timestamp": 1467937616191
+ },
+ "18f2b1e6-444c-4981-876e-82b459d25e5e": {
+ "id": "18f2b1e6-444c-4981-876e-82b459d25e5e",
+ "locked": false,
+ "timestamp": 1467937548590,
+ "title": "to delete yo",
+ "text": "Fe26.2**8f9a5ec33d9122c996dd2ac15fae70e1a9fd9630d8840e343fc2d8e4a893e7ea*dupIWuAFhfDOatR2ecDsiw*KiZbCYJEuGsKOR_fRwz8dnxbxRo7xXvh0JxZJfz-hhI**584c5b183bd7f2114763610ff3a8dc1485ba098b511141ea04035d11af68381d*VZxvATygv3f3Vr-lvf2GmscoGK9CxG23yI1VPrTiY3A",
+ "deleted": true
+ }
+ },
+ "notesOrdering": [
+ "f1ffff6d-a4c2-4f5f-88f0-1da4a7384a12",
+ "6bbe5ca3-8e0d-497b-a1ba-024396345979"
+ ],
+ "notesOrderingTimestamp": Date.now(),
+ "token": DBManager.getCurrentToken()
+ }
+ */
