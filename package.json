@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron main.js",
     "watch": "watchify app/app.js -t babelify -o ./public/js/bundle.js --debug --verbose",
-    "comps": "python scripts/export_components.py"
+    "build": "mkdir public; mkdir public/js; browserify app/app.js -t babelify -o ./public/js/bundle.js"
   },
   "repository": {
     "type": "git",
