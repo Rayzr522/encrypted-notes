@@ -1,6 +1,5 @@
 import DBManager from './db'
 import deepDiff from 'deep-diff'
-import { diffKinds } from '../utils/constants'
 import SyncTest from '../tests/onlinesync'
 import request from 'request'
 import { config } from '../config'
@@ -69,7 +68,7 @@ class Sync {
             notesOrderingTimestamp: remoteOrderingTimestamp
         } = remoteData
 
-        let newOrder, diffKind
+        let newOrder
         if (remoteOrderingTimestamp > localOrderingTimestamp) {
             newOrder = remoteOrdering
         } else {
