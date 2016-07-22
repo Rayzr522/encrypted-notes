@@ -24,7 +24,8 @@ const SyncScreen = React.createClass({
     generateToken() {
         const token = DBManager.getUUID()
         DBManager.setCurrentToken(token)
-        this.doSync()
+        this.setTokenState()
+        this.pushToRemote()
     },
 
     showTokenInput() {
@@ -43,8 +44,9 @@ const SyncScreen = React.createClass({
             return
         }
         DBManager.setCurrentToken(token)
+        this.setTokenState()
         this.removeTokenInput()
-        this.doSync()
+        this.mergeFromRemote()
     },
 
     handleTokenEvent(e) {
@@ -59,9 +61,12 @@ const SyncScreen = React.createClass({
         }
     },
 
-    doSync() {
-        Sync.sync(DBManager.getCurrentToken())
-        this.setTokenState()
+    mergeFromRemote() {
+        Sync.sync(false)
+    },
+
+    pushToRemote() {
+        Sync.updateRemoteDataWithLocal(DBManager.getCurrentToken(), () => {})
     },
 
     render() {
@@ -74,6 +79,14 @@ const SyncScreen = React.createClass({
                 <button disabled={this.state.enteringToken} onClick={this.showTokenInput}>
                     Use Existing Token
                 </button>
+                <br /><br />
+                <button disabled={this.state.enteringToken || this.state.currentToken == null} onClick={this.mergeFromRemote}>
+                    Pull & Merge From Remote
+                </button>
+                &nbsp;&nbsp;&nbsp;
+                <button disabled={this.state.enteringToken || this.state.currentToken == null} onClick={this.pushToRemote}>
+                    Push to Remote (no merge)
+                </button>
             </div>
         )
 
@@ -85,7 +98,7 @@ const SyncScreen = React.createClass({
                 <div>
                     Enter an existing token that matches one in the system already:
                     <kbd
-                        style={{position: 'relative', top: 2, left: 193, fontSize: 18, cursor: 'pointer'}}
+                        style={{position: 'relative', top: 2, left: 150, fontSize: 18, cursor: 'pointer'}}
                         onClick={this.useExistingToken} title="Accept"
                     >
                         {unicodeSymbols.check}
@@ -115,6 +128,15 @@ const SyncScreen = React.createClass({
                 <h2 style={{display: 'inline-block'}}>Online Sync Settings</h2>
                 &nbsp;&nbsp;
                 <button onClick={this.backToStart}>Back</button>
+                <p style={{fontWeight: 'bold'}}>
+                    Please Note! : All of your remotely saved notes are connected to a specific sync token.
+                    If you ever lose that token, you will also lose access to your remote notes. If you change tokens, your remote
+                    notes will remain with your old token, and will not be accessible unless you re-enter your old token
+                    using the "Use Existing Token" option.
+                    <br />
+                    Generating a new token will move all of your local notes over to a new sync token, and then upload them
+                    with the new token.
+                </p>
                 <div>
                     {currentToken}
                     <br />

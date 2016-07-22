@@ -7,16 +7,16 @@ import { config } from '../config'
 
 class Sync {
     static getRemoteData(token, callback) {
-        const url = `http://localhost:3000/notes/${token}`
+        const url = config.syncUrl + token
         return request(url, (err, incoming, res) => {
             if (err) {
                 console.error(err)
                 callback(false)
             } else {
                 if (incoming.statusCode == 404) {
-                    callback({msg: 'Invalid key', statusCode: 404})
+                    callback({error: 'Invalid key', statusCode: 404})
                 } else if (incoming.statusCode == 200) {
-                    callback({statusCode: 200, msg: res})
+                    callback({statusCode: 200, msg: JSON.parse(res)})
                 } else {
                     console.error(`Invalid status code for ${url}`)
                 }
@@ -26,12 +26,14 @@ class Sync {
 
     static updateRemoteDataWithLocal(token, callback) {
         const url = config.syncUrl + token
-        return request.post(url, {form: this.getLocalData()}, (err, incoming, res) => {
+        return request.post(url, {
+            form: {notesObj: JSON.stringify(this.getLocalData())},
+        }, (err, incoming, res) => {
             if (err) {
                 console.error(err)
             } else {
                 if (incoming.statusCode == 500) {
-                    callback({msg: 'Unable to update remote with latest changes.', statusCode: 500})
+                    callback({error: 'Unable to update remote with latest changes.', statusCode: 500})
                 } else if (incoming.statusCode == 200) {
                     callback({statusCode: 200, msg: res})
                 } else {
@@ -52,7 +54,9 @@ class Sync {
 
     static merge(localData = this.getLocalData(), remoteData = null) {
         if (remoteData.token != localData.token) {
-            console.error(`Local token is ${localData.token} but remote token is ${remoteData.token}!`)
+            if (remoteData.token != null) {
+                console.error(`Local token is ${localData.token} but remote token is ${remoteData.token}!`)
+            }
             return [localData.notes, localData.notesOrdering]
         }
 
@@ -65,19 +69,12 @@ class Sync {
             notesOrderingTimestamp: remoteOrderingTimestamp
         } = remoteData
 
-
         let newOrder, diffKind
         if (remoteOrderingTimestamp > localOrderingTimestamp) {
             newOrder = remoteOrdering
-            diffKind = diffKinds.DEL
         } else {
             newOrder = localOrdering
-            diffKind = diffKinds.NEW
         }
-
-
-        //let changesMade = new Set(newOrder)
-        //changesMade.add(noteId)
 
         /*
          After this finishes, each note in localData will be updated with data from
@@ -135,18 +132,25 @@ class Sync {
     /*
     Returns a Promise
      */
-    static sync() {
+    static sync(pushAlso = true) {
         const localData = this.getLocalData()
 
         const mergedDataPromise = new Promise((resolve, reject) => {
             this.getRemoteData(localData.token, (res) => {
-                resolve(this.merge(localData, res))
+                if (res.error) {
+                    reject(res)
+                } else {
+                    resolve(this.merge(localData, res.msg))
+                }
             })
         })
         mergedDataPromise.then((merged) => {
             const [mergedNotes, mergedOrdering] = merged
             DBManager.setNotes(mergedNotes, mergedOrdering)
-            this.updateRemoteDataWithLocal(localData.token, (res) => {})
+            if (pushAlso) {
+                this.updateRemoteDataWithLocal(localData.token, (res) => {
+                })
+            }
         })
     }
 
