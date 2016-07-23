@@ -63,7 +63,7 @@ const EditorScreen = React.createClass({
         return (
             <div>
                 <h2>{titleInput}</h2>
-                <TinyMCEEditor ref={editorRef} content={this.state.note.text}/>
+                <TinyMCEEditor ref={editorRef} content={this.state.note.text} dspMsg={this.props.dspMsg}/>
                 <button onClick={this.saveNote}>Save</button>
                 <button onClick={this.cancelEdits}>Cancel</button>
                 <button onClick={this.deleteNote}>Delete</button>

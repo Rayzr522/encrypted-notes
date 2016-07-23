@@ -5,6 +5,7 @@ import db from '../utils/localStorage'
 import { t } from '../utils/helpers'
 import uuid from 'node-uuid'
 import Encryption from './encryption'
+import { NoteAlreadyExistsError, CannotDeleteNoteError, DatabaseIntegrityError } from '../utils/errors'
 window.db = db
 
 class DBManager {
@@ -96,7 +97,7 @@ class DBManager {
             note.id = this.getUUID()
         }
         if (db.has(note.id)) {
-            throw new Error(`Id ${note.id} already exists in the database!`)
+            throw new NoteAlreadyExistsError(note.id)
         }
         if (note.locked == null) {
             note.locked = false
@@ -141,7 +142,7 @@ class DBManager {
     static deleteNote(noteId) {
         const note = this.getNote(noteId)
         if (note.locked) {
-            throw new Error('You cannot delete a locked note!')
+            throw new CannotDeleteNoteError(null, 'You cannot delete a locked note!')
         }
 
         note.deleted = true
@@ -186,10 +187,7 @@ class DBManager {
         ).length
 
         if (notesLength != notesOrdering.length) {
-            console.error(
-                `There is an inconsistency between notes and their ordering.
-                There are ${notesLength} notes and ${notesOrdering.length} ordering items.`
-            )
+            throw new DatabaseIntegrityError()
         }
     }
 }

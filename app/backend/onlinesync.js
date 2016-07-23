@@ -3,21 +3,22 @@ import deepDiff from 'deep-diff'
 import SyncTest from '../tests/onlinesync'
 import request from 'request'
 import { config } from '../config'
+import { RequestError, RemoteTokenMismatchError } from '../utils/errors'
 
 class Sync {
     static getRemoteData(token, callback) {
         const url = config.syncUrl + token
         return request(url, (err, incoming, res) => {
             if (err) {
-                console.error(err)
                 callback(false)
+                throw new RequestError(url, null, err)
             } else {
                 if (incoming.statusCode == 404) {
                     callback({error: 'Invalid key', statusCode: 404})
                 } else if (incoming.statusCode == 200) {
                     callback({statusCode: 200, msg: JSON.parse(res)})
                 } else {
-                    console.error(`Invalid status code for ${url}`)
+                    throw new RequestError(url, null, res)
                 }
             }
         })
@@ -25,18 +26,18 @@ class Sync {
 
     static updateRemoteDataWithLocal(token, callback) {
         const url = config.syncUrl + token
-        return request.post(url, {
-            form: {notesObj: JSON.stringify(this.getLocalData())},
-        }, (err, incoming, res) => {
+        const data = {notesObj: JSON.stringify(this.getLocalData())}
+        return request.post(url, {form: data}, (err, incoming, res) => {
             if (err) {
-                console.error(err)
+                callback(false)
+                throw new RequestError(url, data, err)
             } else {
                 if (incoming.statusCode == 500) {
                     callback({error: 'Unable to update remote with latest changes.', statusCode: 500})
                 } else if (incoming.statusCode == 200) {
                     callback({statusCode: 200, msg: res})
                 } else {
-                    console.error(`Invalid status code for ${url}`)
+                    throw new RequestError(url, data, res)
                 }
             }
         })
@@ -54,7 +55,7 @@ class Sync {
     static merge(localData = this.getLocalData(), remoteData = null) {
         if (remoteData.token != localData.token) {
             if (remoteData.token != null) {
-                console.error(`Local token is ${localData.token} but remote token is ${remoteData.token}!`)
+                throw new RemoteTokenMismatchError(localData.token, remoteData.token)
             }
             return [localData.notes, localData.notesOrdering]
         }
@@ -151,10 +152,6 @@ class Sync {
                 })
             }
         })
-    }
-
-    static handleChanges() {
-
     }
 }
 

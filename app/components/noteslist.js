@@ -91,7 +91,7 @@ const NotesList = React.createClass({
                 <NoteItem
                     key={note.id} index={i} note={note} deleteNote={this.deleteNote}
                     moveNote={this.moveNote} requestScreenChange={this.props.requestScreenChange}
-                    toggleNoteLock={this.toggleNoteLock}
+                    toggleNoteLock={this.toggleNoteLock} dspMsg={this.props.dspMsg}
                 />
             )
         })

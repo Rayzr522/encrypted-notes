@@ -3,6 +3,7 @@ import { screens, eventTypes, keyCodes, unicodeSymbols } from '../utils/constant
 import DBManager from '../backend/db'
 import Sync from '../backend/onlinesync'
 import { validateUUID, sleep } from '../utils/helpers'
+import { ValidationError } from '../utils/errors'
 
 const SyncScreen = React.createClass({
     getInitialState() {
@@ -40,8 +41,7 @@ const SyncScreen = React.createClass({
     useExistingToken() {
         const token = this.tokenInput.value
         if (!validateUUID(token)) {
-            alert(`${token} is not a valid UUID!`)
-            return
+            throw new ValidationError(null, `${token} is not a valid UUID`)
         }
         DBManager.setCurrentToken(token)
         this.setTokenState()

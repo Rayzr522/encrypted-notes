@@ -4,6 +4,7 @@ import { config } from '../config'
 import { sleep } from '../utils/helpers'
 import { cardSource, cardTarget, dragSourceCollect, dropTargetCollect, dropType } from '../utils/dragAndDropHelpers'
 import { DragSource, DropTarget } from 'react-dnd'
+import { IncorrectPasswordError, PasswordsDoNotMatchError, UnknownError, ValidationError } from '../utils/errors'
 
 const listItemStyle = {
     border: '1px dashed gray',
@@ -52,11 +53,10 @@ const NoteItem = React.createClass({
     toggleNoteCallback(success, error) {
         if (!success) {
             if (error.message == 'Bad hmac value') {
-                alert('Your entered password was incorrect!')
+                throw new IncorrectPasswordError()
             } else {
-                alert('There was an unknown error.')
+                throw new UnknownError('toggleNoteCallback')
             }
-            return
         }
         this.removePasswordInput()
     },
@@ -75,8 +75,7 @@ const NoteItem = React.createClass({
         }
 
         if (!this.validatePassword(this.passwordInput.value)) {
-            alert('Your password is invalid!')
-            return
+            throw new ValidationError()
         }
 
         if (!this.state.note.locked && !confirm(
