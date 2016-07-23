@@ -28,6 +28,9 @@ const BasicRouter = React.createClass({
     },
 
     handleError(e) {
+        window.e = e
+        console.log('Handling error')
+        e.preventDefault()
     },
 
     dspMsg(msgObj) {
