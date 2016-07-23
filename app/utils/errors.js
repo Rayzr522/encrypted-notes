@@ -1,21 +1,26 @@
 class ExtendableError extends Error {
-    constructor(message, includeStack = false) {
+    constructor(message) {
         super(message);
         this.name = this.constructor.name;
+        this.message = message;
         if (typeof Error.captureStackTrace === 'function') {
             Error.captureStackTrace(this, this.constructor);
         } else {
             this.stack = (new Error(message)).stack;
         }
-        if (includeStack) {
-            message += ` Stack: ${this.stack}`
-        }
-        this.message = message;
+    }
+
+    toString() {
+        return `[object ${this.name}]`
+    }
+
+    dsp() {
+        return `${this.toString()} -> ${this.stack}`
     }
 }
 class FatalError extends ExtendableError {
     constructor(err = null, msg = `Please contact yonilerner@gmail.com for assistance. Error is: ${err}.`) {
-        super(msg, true)
+        super(msg)
     }
 }
 class SevereError extends ExtendableError {

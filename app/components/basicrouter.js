@@ -52,7 +52,6 @@ const BasicRouter = React.createClass({
                 break
             default:
                 throw new InvalidScreenError(this.state.screen)
-                break
         }
         return screenElem
     }
