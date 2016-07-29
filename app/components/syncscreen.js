@@ -1,5 +1,5 @@
 import React from 'react'
-import { screens, eventTypes, keyCodes, unicodeSymbols } from '../utils/constants'
+import { screens, eventTypes, keyCodes, unicodeSymbols, messageTypes } from '../utils/constants'
 import DBManager from '../backend/db'
 import Sync from '../backend/onlinesync'
 import { validateUUID, sleep } from '../utils/helpers'
@@ -10,6 +10,7 @@ const SyncScreen = React.createClass({
         return {
             currentToken: DBManager.getCurrentToken(),
             enteringToken: false,
+            waiting: false,
             ...this.props
         }
     },
@@ -68,30 +69,53 @@ const SyncScreen = React.createClass({
         }
     },
 
+    placeholderMsg() {
+        return 'Please wait for a response from the server...'
+    },
+
     mergeFromRemote() {
-        Sync.sync(false)
+        this.props.dspMsg(this.placeholderMsg())
+        Sync.sync((response) => {
+            if (response.statusCode != 200) {
+                this.props.dspMsg(
+                    `There was an error getting notes from the remote server: ${response.statusCode} - ${response.error}`
+                , messageTypes.ERROR)
+            } else {
+                this.props.dspMsg('Download from remote server complete!', messageTypes.SUCCESS, 2)
+            }
+        })
     },
 
     pushToRemote() {
-        Sync.updateRemoteDataWithLocal(DBManager.getCurrentToken(), () => {})
+        this.props.dspMsg(this.placeholderMsg())
+        Sync.updateRemoteDataWithLocal(DBManager.getCurrentToken(), (response) => {
+            if (response.statusCode != 200) {
+                this.props.dspMsg(
+                    `There was an error pushing to the remote server: ${response.statusCode} - ${response.error}`
+                , messageTypes.ERROR)
+            } else {
+                this.props.dspMsg('Push to remote complete!', messageTypes.SUCCESS, 2)
+            }
+        })
     },
 
     render() {
+        const buttonsDisabled = this.state.enteringToken || this.state.waiting
         let tokenButtons = (
             <div>
-                <button disabled={this.state.enteringToken} onClick={this.generateToken}>
+                <button disabled={buttonsDisabled} onClick={this.generateToken}>
                     Generate New Token to Use
                 </button>
                 &nbsp;&nbsp;&nbsp;
-                <button disabled={this.state.enteringToken} onClick={this.showTokenInput}>
+                <button disabled={buttonsDisabled} onClick={this.showTokenInput}>
                     Use Existing Token
                 </button>
                 <br /><br />
-                <button disabled={this.state.enteringToken || this.state.currentToken == null} onClick={this.mergeFromRemote}>
+                <button disabled={buttonsDisabled || this.state.currentToken == null} onClick={this.mergeFromRemote}>
                     Pull & Merge From Remote
                 </button>
                 &nbsp;&nbsp;&nbsp;
-                <button disabled={this.state.enteringToken || this.state.currentToken == null} onClick={this.pushToRemote}>
+                <button disabled={buttonsDisabled || this.state.currentToken == null} onClick={this.pushToRemote}>
                     Push to Remote (no merge)
                 </button>
             </div>

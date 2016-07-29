@@ -19,10 +19,6 @@ const NotesList = React.createClass({
         return DBManager.getNotesOrdered()
     },
 
-    componentWillReceiveProps(newProps) {
-        this.setState({items: newProps.items})
-    },
-
     moveNote(draggedFromIndex, hoverToIndex) {
         const {items} = this.state
         const draggedCard = items[draggedFromIndex]
@@ -58,7 +54,7 @@ const NotesList = React.createClass({
 
         const doUpdate = (note) => {
             DBManager.updateNote(note)
-            sleep(0).then(() => this.setState({items: this.getItemsFromDB()}))
+            this.setState({items: this.getItemsFromDB()})
             callback(true)
         }
 

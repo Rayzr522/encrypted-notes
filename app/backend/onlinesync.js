@@ -10,7 +10,6 @@ class Sync {
         const url = config.syncUrl + token
         return request(url, (err, incoming, res) => {
             if (err) {
-                callback(false)
                 throw new RequestError(url, null, err)
             } else {
                 if (incoming.statusCode == 404) {
@@ -29,7 +28,6 @@ class Sync {
         const data = {notesObj: JSON.stringify(this.getLocalData())}
         return request.post(url, {form: data}, (err, incoming, res) => {
             if (err) {
-                callback(false)
                 throw new RequestError(url, data, err)
             } else {
                 if (incoming.statusCode == 500) {
@@ -132,25 +130,24 @@ class Sync {
     /*
     Returns a Promise
      */
-    static sync(pushAlso = true) {
+    static sync(callback) {
         const localData = this.getLocalData()
 
         const mergedDataPromise = new Promise((resolve, reject) => {
             this.getRemoteData(localData.token, (res) => {
                 if (res.error) {
-                    reject(res)
+                    callback(res)
                 } else {
-                    resolve(this.merge(localData, res.msg))
+                    const merged = this.merge(localData, res.msg)
+                    res.msg = merged
+                    resolve(res)
                 }
             })
         })
-        mergedDataPromise.then((merged) => {
-            const [mergedNotes, mergedOrdering] = merged
+        mergedDataPromise.then((res) => {
+            const [mergedNotes, mergedOrdering] = res.msg
             DBManager.setNotes(mergedNotes, mergedOrdering)
-            if (pushAlso) {
-                this.updateRemoteDataWithLocal(localData.token, (res) => {
-                })
-            }
+            callback(res)
         })
     }
 }

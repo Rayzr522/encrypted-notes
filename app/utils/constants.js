@@ -30,4 +30,10 @@ const diffKinds = {
     ARR: 'A'
 }
 
-export { screens, unicodeSymbols, keyCodes, eventTypes, diffKinds }
+const messageTypes = {
+    NOTICE: 0,
+    SUCCESS: 1,
+    ERROR: 2
+}
+
+export { screens, unicodeSymbols, keyCodes, eventTypes, diffKinds, messageTypes }
