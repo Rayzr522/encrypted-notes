@@ -4,5 +4,5 @@ exports.config = {
         height: 800
     },
     minimumPasswordLength: 8,
-    syncUrl: 'http://localhost:3000/notes/'
+    syncUrl: 'http://jim.yonilerner.org:3000/notes/'
 }

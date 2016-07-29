@@ -23,6 +23,13 @@ const SyncScreen = React.createClass({
     },
 
     generateToken() {
+        if (!confirm(
+            'Are you sure you want to generate a new token? Any notes not synced from the remote server will ' +
+            'remain connected to your old token, and not retrievable unless your old token is used to download them.'
+        )) {
+            return
+        }
+
         const token = DBManager.getUUID()
         DBManager.setCurrentToken(token)
         this.setTokenState()
@@ -98,14 +105,14 @@ const SyncScreen = React.createClass({
                 <div>
                     Enter an existing token that matches one in the system already:
                     <kbd
-                        style={{position: 'relative', top: 2, left: 150, fontSize: 18, cursor: 'pointer'}}
+                        style={{position: 'relative', top: 2, left: 265, fontSize: 18, cursor: 'pointer'}}
                         onClick={this.useExistingToken} title="Accept"
                     >
                         {unicodeSymbols.check}
                     </kbd>
                     <input
                         placeholder="Enter Token" ref={(ref)=>this.tokenInput=ref}
-                        onKeyDown={this.handleTokenEvent}
+                        onKeyDown={this.handleTokenEvent} style={{width: 240}}
                     />
                 </div>
             )

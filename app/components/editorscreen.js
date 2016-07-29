@@ -1,7 +1,8 @@
 import React from 'react'
-import {screens} from '../utils/constants'
+import { screens } from '../utils/constants'
 import DBManager from '../backend/db'
 import TinyMCEEditor from './tinymceeditor'
+import { t } from '../utils/helpers'
 
 
 const EditorScreen = React.createClass({
@@ -20,7 +21,7 @@ const EditorScreen = React.createClass({
     getCurrentNoteValues() {
         return {
             title: this.titleInput.value,
-            text: this.editor.getContent()
+            text: t(this.editor.getContent(), '')
         }
     },
     
