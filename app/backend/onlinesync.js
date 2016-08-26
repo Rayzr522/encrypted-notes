@@ -127,9 +127,6 @@ class Sync {
         return [localNotes, newOrder]
     }
 
-    /*
-    Returns a Promise
-     */
     static sync(callback) {
         const localData = this.getLocalData()
 
