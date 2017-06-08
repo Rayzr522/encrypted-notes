@@ -7,12 +7,10 @@ import { DragSource, DropTarget } from 'react-dnd'
 import { IncorrectPasswordError, PasswordsDoNotMatchError, UnknownError, ValidationError } from '../utils/errors'
 
 const listItemStyle = {
-    border: '1px dashed gray',
     padding: '0.5rem 1rem',
     marginBottom: '.5rem',
     backgroundColor: 'white',
     cursor: 'move',
-    paddingLeft: 25,
     marginRight: 45
 }
 
@@ -42,12 +40,12 @@ const NoteItem = React.createClass({
     },
 
     lockHandler() {
-        this.setState({enteringPassword: true})
+        this.setState({ enteringPassword: true })
         sleep(0).then(() => this.passwordInput.focus())
     },
 
     removePasswordInput() {
-        this.setState({enteringPassword: false})
+        this.setState({ enteringPassword: false })
     },
 
     toggleNoteCallback(success, error) {
@@ -68,7 +66,7 @@ const NoteItem = React.createClass({
                 return
             } else if (e.keyCode != keyCodes.ENTER) {
                 sleep(0).then(() => {
-                    this.setState({currentPassword: this.passwordInput.value})
+                    this.setState({ currentPassword: this.passwordInput.value })
                 })
                 return
             }
@@ -79,9 +77,9 @@ const NoteItem = React.createClass({
         }
 
         if (!this.state.note.locked && !confirm(
-                'Are you sure you want to lock this note? ' +
-                'If you forget the password, the note will be impossible to recover!'
-            )
+            'Are you sure you want to lock this note? ' +
+            'If you forget the password, the note will be impossible to recover!'
+        )
         ) {
             return
         }
@@ -97,7 +95,7 @@ const NoteItem = React.createClass({
     },
 
     componentWillReceiveProps(newProps) {
-        this.setState({index: newProps.index, note: newProps.note})
+        this.setState({ index: newProps.index, note: newProps.note })
     },
 
     render() {
@@ -134,15 +132,15 @@ const NoteItem = React.createClass({
             const borderColor = this.validatePassword(this.state.currentPassword) ? 'green' : 'red'
 
             lockToggle = (
-                <div style={{...buttonStyle, right: lockToggleRightOffset, top:-6}}>
+                <div style={{ ...buttonStyle, right: lockToggleRightOffset, top: -6 }}>
                     {/* passwordInput */}
                     <input
-                        style={{border: `2px solid ${borderColor}`}}
-                        type="password" ref={(ref)=>this.passwordInput=ref}
+                        style={{ border: `2px solid ${borderColor}` }}
+                        type="password" ref={(ref) => this.passwordInput = ref}
                         onKeyDown={this.confirmPassword} placeholder="Password"
                     />
                     {/* check */}
-                    <kbd style={{position: 'relative', top: 2, left: 2}} onClick={this.confirmPassword} title="Accept">
+                    <kbd style={{ position: 'relative', top: 2, left: 2 }} onClick={this.confirmPassword} title="Accept">
                         {unicodeSymbols.check}
                     </kbd>
                 </div>
@@ -152,7 +150,7 @@ const NoteItem = React.createClass({
             lockToggle = (
                 <div
                     onClick={this.lockHandler}
-                    style={{...buttonStyle, right: lockToggleRightOffset, top: -4, color: this.state.note.locked ? 'red' : 'green'}}
+                    style={{ ...buttonStyle, right: lockToggleRightOffset, top: -4, color: this.state.note.locked ? 'red' : 'green' }}
                     title={`${this.state.note.locked ? 'Unlock' : 'Lock'}`}
                 >
                     <kdb>{this.state.note.locked ? unicodeSymbols.unlocked : unicodeSymbols.locked}</kdb>
@@ -164,12 +162,12 @@ const NoteItem = React.createClass({
 
         if (!this.state.note.locked) {
             deleteSect = (
-                <div title="Delete" onClick={this.deleteHandler} style={{...buttonStyle, left: 5}}>
+                <div title="Delete" onClick={this.deleteHandler} style={{ ...buttonStyle, left: 5 }}>
                     <kbd>{unicodeSymbols.delete}</kbd>
                 </div>
             )
             edit = (
-                <div title="Edit" onClick={this.editHandler} style={{...buttonStyle, right: 5}}>
+                <div title="Edit" onClick={this.editHandler} style={{ ...buttonStyle, right: 5 }}>
                     <kbd>{unicodeSymbols.edit}</kbd>
                 </div>
             )
@@ -177,7 +175,7 @@ const NoteItem = React.createClass({
 
         const opacity = isDragging ? 0 : 1
         return connectDragSource(connectDropTarget(
-            <li style={{...listItemStyle, opacity}}>
+            <li style={{ ...listItemStyle, opacity }}>
                 {lockedStatus}
                 {title}
                 {deleteSect}

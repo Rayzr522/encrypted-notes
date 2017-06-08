@@ -16,7 +16,6 @@ const StartScreen = React.createClass({
             <div>
                 <h2>Note Taker</h2>
                 <button onClick={this.newNote}>+ New Note</button>
-                &nbsp;&nbsp;&nbsp;
                 <button onClick={this.syncSettings}>Sync Settings</button>
                 <NotesList requestScreenChange={this.props.requestScreenChange} dspMsg={this.props.dspMsg} />
             </div>
