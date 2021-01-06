@@ -2790,9 +2790,9 @@ timers-browserify@^1.0.1:
   dependencies:
     process "~0.11.0"
 
-tinymce@^4.4.0:
-  version "4.6.3"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.6.3.tgz#94ad24ead4f13938c0903afd2ff469c0b655623e"
+tinymce@^5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.6.0.tgz#b5eda4888e1a607ddd545619cfaa137d59de14b4"
 
 to-arraybuffer@^1.0.0:
   version "1.0.1"
